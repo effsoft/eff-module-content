@@ -1,97 +1,64 @@
 {
-    "name": "effsoft/eff-module-content",
-    "description": "",
-    "keywords": ["effsoft","eff-module-content"],
-    "homepage": "https://github.com/effsoft/eff-module-content",
-    "type": "eff-module",
-    "license": "MIT",
-    "minimum-stability": "stable",
-    "require": {
-      "php": ">=7.2.0",
-      "yiisoft/yii2": "~2.0.14",
-      "ircmaxell/random-lib": "~1.2.0",
-      "hashids/hashids": "~3.0.0",
-      "effsoft/eff": "dev-master",
-      "effsoft/eff-asset-tinymce": "dev-master",
-      "effsoft/eff-asset-fontawesome": "dev-master",
-      "effsoft/eff-asset-jquery": "dev-master",
-      "effsoft/eff-asset-bootstrap-bundle": "dev-master",
-      "effsoft/eff-asset-jquery-easing": "dev-master",
-      "effsoft/eff-asset-magnific-popup": "dev-master",
-      "effsoft/eff-asset-chart-js": "dev-master"
+  "name": "effsoft/eff-module-content",
+  "description": "",
+  "keywords": [
+    "effsoft",
+    "eff-module-content"
+  ],
+  "homepage": "https://github.com/effsoft/eff-module-content",
+  "type": "eff-module",
+  "license": "MIT",
+  "minimum-stability": "stable",
+  "require": {
+    "php": ">=7.2.0",
+    "yiisoft/yii2": "~2.0.14",
+    "hashids/hashids": "~3.0.0",
+    "effsoft/eff": "dev-master"
+  },
+  "require-dev": {
+
+  },
+  "config": {
+    "process-timeout": 1800,
+    "fxp-asset": {
+      "enabled": false
+    }
+  },
+  "autoload": {
+    "psr-4": {
+      "effsoft\\eff\\module\\content\\": "src/"
+    }
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "effsoft\\eff\\module\\content\\": "src/"
+    }
+  },
+  "repositories": {
+    "eff-module-role": {
+      "type": "path",
+      "url": "../eff-module-role"
     },
-    "require-dev": {
-  
+    "eff-module-passport": {
+      "type": "path",
+      "url": "../eff-module-passport"
     },
-    "config": {
-      "process-timeout": 1800,
-      "fxp-asset": {
-        "enabled": false
-      }
+    "eff": {
+      "type": "path",
+      "url": "../eff"
     },
-    "autoload" : {
-      "psr-4" : {
-        "effsoft\\eff\\module\\content\\" : "src/"
-      }
+    "packagist-image": {
+      "type": "composer",
+      "url": "https://packagist.phpcomposer.com"
     },
-    "autoload-dev" : {
-      "psr-4" : {
-        "effsoft\\eff\\module\\content\\" : "src/"
-      }
+    "asset-packagist": {
+      "type": "composer",
+      "url": "https://asset-packagist.org"
     },
-    "repositories": {
-      "eff-asset-tinymce":{
-        "type": "path",
-        "url": "../eff-asset-tinymce"
-      },
-      "eff-asset-chart-js":{
-        "type": "path",
-        "url": "../eff-asset-chart-js"
-      },
-      "eff-asset-fontawesome":{
-        "type": "path",
-        "url": "../eff-asset-fontawesome"
-      },
-      "eff-asset-jquery":{
-        "type": "path",
-        "url": "../eff-asset-jquery"
-      },
-      "eff-asset-magnific-popup":{
-        "type": "path",
-        "url": "../eff-asset-magnific-popup"
-      },
-      "eff-asset-jquery-easing":{
-        "type": "path",
-        "url": "../eff-asset-jquery-easing"
-      },
-      "eff-asset-bootstrap-bundle":{
-        "type": "path",
-        "url": "../eff-asset-bootstrap-bundle"
-      },
-      "eff-module-verify":{
-        "type": "path",
-        "url": "../eff-module-verify"
-      },
-      "eff-module-passport":{
-        "type": "path",
-        "url": "../eff-module-passport"
-      },
-      "eff":{
-        "type": "path",
-        "url": "../eff"
-      },
-      "packagist-image":{
-        "type": "composer",
-        "url": "https://packagist.phpcomposer.com"
-      },
-      "asset-packagist":{
-        "type": "composer",
-        "url": "https://asset-packagist.org"
-      },
-      "packagist":{
-        "type": "composer",
-        "url": "https://packagist.org"
-      }
+    "packagist": {
+      "type": "composer",
+      "url": "https://packagist.org"
     }
   }
+}
   

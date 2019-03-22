@@ -10,6 +10,9 @@ class Module extends EffModule {
 
     public function init(){
         parent::init();
+
+        \Yii::setAlias('@'.$this->module_name, __DIR__);
+
         $this->registTranslations();
         $this->registSubModules();
     }
