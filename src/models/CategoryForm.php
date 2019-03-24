@@ -4,7 +4,7 @@ namespace effsoft\eff\module\content\models;
 
 use effsoft\eff\EffModel;
 
-class CategoryCreateForm extends EffModel{
+class CategoryForm extends EffModel{
     public $name;
     public $parent_id;
     public $description;

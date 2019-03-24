@@ -1,6 +1,6 @@
 <?php
 
-namespace effsoft\eff\module\content\modules\admin\models;
+namespace effsoft\eff\module\content\models;
 
 use effsoft\eff\EffActiveRecord;
 use yii\helpers\ArrayHelper;
@@ -18,6 +18,7 @@ class CategoryModel extends EffActiveRecord
         return [
             '_id',
             'name',
+            'description',
             'parent_id',
             'order',
         ];

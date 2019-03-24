@@ -3,10 +3,15 @@
 namespace effsoft\eff\module\content\modules\admin\controllers;
 
 use effsoft\eff\EffController;
-use effsoft\eff\module\content\modules\admin\models\CategoryCreateForm;
-use effsoft\eff\module\content\modules\admin\models\CategoryModel;
+use effsoft\eff\helpers\Ids;
+use effsoft\eff\module\content\models\CategoryForm;
+use effsoft\eff\module\content\models\CategoryModel;
+use effsoft\eff\response\JsonResult;
+use MongoDB\BSON\Regex;
 use yii\filters\AccessControl;
+use yii\helpers\Json;
 use yii\helpers\Url;
+use yii\web\Response;
 
 
 class CategoryController extends EffController
@@ -19,7 +24,7 @@ class CategoryController extends EffController
                 'class' => AccessControl::className(),
                 'rules' => [
                     [
-                        'actions' => ['manage', 'create'],
+                        'actions' => ['manage', 'create', 'delete', 'edit'],
                         'allow' => true,
                         'roles' => ['@'],
                     ],
@@ -32,7 +37,7 @@ class CategoryController extends EffController
     {
         parent::init();
         $this->pushBreadcrumbLink([
-            'label' => \Yii::t('eff-module-content/app', 'Category'),
+            'label' => \Yii::t('content/app', 'Category'),
             'url' => ['/content/admin/category/manage'],
         ]);
     }
@@ -40,7 +45,7 @@ class CategoryController extends EffController
     public function actionManage()
     {
         $this->pushBreadcrumbLink([
-            'label' => \Yii::t('eff-module-content/app', 'Manage'),
+            'label' => \Yii::t('content/app', 'Manage'),
         ]);
         return $this->render('//content/admin/category/manage');
     }
@@ -48,37 +53,38 @@ class CategoryController extends EffController
     public function actionCreate()
     {
         $this->pushBreadcrumbLink([
-            'label' => \Yii::t('eff-module-content/app', 'Create'),
+            'label' => \Yii::t('content/app', 'Create'),
         ]);
 
-        $category_create_form = new CategoryCreateForm();
+        $category_form = new CategoryForm();
 
         if (\Yii::$app->request->isPost) {
-            $category_create_form->load(\Yii::$app->request->post());
-            if (!$category_create_form->validate()) {
+            $category_form->load(\Yii::$app->request->post());
+            if (!$category_form->validate()) {
                 return $this->render('//content/admin/category/create',
                     [
-                        'category_create_form' => $category_create_form,
+                        'category_form' => $category_form,
                     ]);
             }
 
-            $category = CategoryModel::findOne(['name' => $category_create_form->name]);
+            $category = CategoryModel::findOne(['name' => new Regex("^$category_form->name$", 'i')]);
             if (!empty($category)) {
-                $category_create_form->addError('db', '该分类名已被占用！');
+                $category_form->addError('db', '该分类名已被占用！');
                 return $this->render('//content/admin/category/create',
                     [
-                        'login_form' => $category_create_form,
+                        'category_form' => $category_form,
                     ]);
             }
 
             $category = new CategoryModel();
-            $category->name = $category_create_form->name;
-            $category->parent_id = $category_create_form->parent_id;
+            $category->name = $category_form->name;
+            $category->parent_id = $category_form->parent_id;
+            $category->description = $category_form->description;
             if (!$category->save()) {
-                $category_create_form->addError('db', '无法保存新的分类！');
+                $category_form->addError('db', '无法保存新的分类！');
                 return $this->render('//content/admin/category/create',
                     [
-                        'login_form' => $category_create_form,
+                        'category_form' => $category_form,
                     ]);
             }
 
@@ -88,7 +94,101 @@ class CategoryController extends EffController
 
         return $this->render('//content/admin/category/create',
             [
-                'category_create_form' => $category_create_form,
+                'category_form' => $category_form,
+            ]
+        );
+    }
+
+    public function actionDelete()
+    {
+        \Yii::$app->response->format = Response::FORMAT_JSON;
+        if (!\Yii::$app->request->isAjax) {
+            return JsonResult::getNewInstance()->setStatus(101)
+                ->setMessage('Bad request!')
+                ->getResult();
+        }
+
+        if (!\Yii::$app->request->validateCsrfToken()) {
+            return JsonResult::getNewInstance()->setStatus(102)
+                ->setMessage('Bad csrf token!')
+                ->getResult();
+        }
+
+        $category_id = Ids::decodeId(\Yii::$app->request->post('category_id'));
+        if (empty($category_id)) {
+            return JsonResult::getNewInstance()->setStatus(103)
+                ->setMessage('Bad parameters!')
+                ->getResult();
+        }
+
+        //check child cateogry
+        $sub_cates = CategoryModel::findAll(['parent_id' => $category_id]);
+        if (!empty($sub_cates)) {
+            return JsonResult::getNewInstance()->setStatus(104)
+                ->setMessage('Has sub categories!')
+                ->getResult();
+        }
+
+        if (!CategoryModel::deleteAll(['_id' => $category_id])) {
+            return JsonResult::getNewInstance()->setStatus(105)
+                ->setMessage('DB error!')
+                ->getResult();
+        }
+
+        //success
+        return JsonResult::getNewInstance()->setStatus(0)
+            ->setMessage('')
+            ->getResult();
+    }
+
+    public function actionEdit()
+    {
+        $this->pushBreadcrumbLink([
+            'label' => \Yii::t('content/app', 'Edit'),
+        ]);
+
+        $category_form = new CategoryForm();
+
+        $category_id = Ids::decodeId(\Yii::$app->request->get('id'));
+        if (empty($category_id)) {
+            return $this->redirect(\Yii::$app->request->getReferrer());
+        }
+        $category = CategoryModel::findOne(['_id' => $category_id]);
+        if (empty($category_id)) {
+            return $this->redirect(\Yii::$app->request->getReferrer());
+        }
+
+        if (\Yii::$app->request->isPost) {
+            $category_form->load(\Yii::$app->request->post());
+            if (!$category_form->validate()) {
+                return $this->render('//content/admin/category/create',
+                    [
+                        'category_form' => $category_form,
+                    ]);
+            }
+
+            $category->name = $category_form->name;
+            $category->description = $category_form->description;
+            $category->parent_id = $category_form->parent_id;
+
+            if (!$category->save()) {
+
+            }
+
+            return \Yii::$app->response->redirect(Url::to(['/content/admin/category/manage']));
+        }
+
+        $category_form->setAttributes([
+            '_id' => $category->_id,
+            'name' => $category->name,
+            'description' => $category->description,
+            'parent_id' => $category->parent_id,
+        ]);
+
+        return $this->render('//content/admin/category/edit',
+            [
+                'category_form' => $category_form,
             ]);
     }
+
 }
