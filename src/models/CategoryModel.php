@@ -36,7 +36,7 @@ class CategoryModel extends EffActiveRecord
 
     public function getDropdownCategories()
     {
-        $array = self::find()->select(['_id', 'parent_id', 'name'])->orderBy(['order' => SORT_DESC])->asArray()->all();
+        $array = self::find()->orderBy(['order' => SORT_DESC])->asArray()->all();
         $array = self::buildTree($array);
         $array = ArrayHelper::map($array, function ($model) {
             return (string)$model['_id'];
