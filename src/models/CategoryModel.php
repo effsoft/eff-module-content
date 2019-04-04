@@ -3,6 +3,7 @@
 namespace effsoft\eff\module\content\models;
 
 use effsoft\eff\EffActiveRecord;
+use effsoft\eff\helpers\Ids;
 use yii\helpers\ArrayHelper;
 
 class CategoryModel extends EffActiveRecord
@@ -35,12 +36,21 @@ class CategoryModel extends EffActiveRecord
         return false;
     }
 
+    public function getParentDropdownCategories(){
+        $array = self::find()->where(['parent_id'=>''])->orderBy(['order' => SORT_DESC])->asArray()->all();
+        $array = self::buildTree($array);
+        $array = ArrayHelper::map($array, function ($model) {
+            return Ids::encodeId((string)$model['_id']);
+        }, 'name');
+        return $array;
+    }
+
     public function getDropdownCategories()
     {
         $array = self::find()->orderBy(['order' => SORT_DESC])->asArray()->all();
         $array = self::buildTree($array);
         $array = ArrayHelper::map($array, function ($model) {
-            return (string)$model['_id'];
+            return Ids::encodeId((string)$model['_id']);
         }, 'name');
         return $array;
     }

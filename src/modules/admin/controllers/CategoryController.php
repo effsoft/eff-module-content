@@ -78,7 +78,7 @@ class CategoryController extends EffController
 
             $category = new CategoryModel();
             $category->name = $category_form->name;
-            $category->parent_id = $category_form->parent_id;
+            $category->parent_id = Ids::decodeId($category_form->parent_id);
             $category->description = $category_form->description;
             if (!$category->save()) {
                 $category_form->addError('db', '无法保存新的分类！');
@@ -125,7 +125,7 @@ class CategoryController extends EffController
         $sub_cates = CategoryModel::findAll(['parent_id' => $category_id]);
         if (!empty($sub_cates)) {
             return JsonResult::getNewInstance()->setStatus(104)
-                ->setMessage('Has sub categories!')
+                ->setMessage('Delete sub categories first!')
                 ->getResponse();
         }
 
@@ -169,7 +169,7 @@ class CategoryController extends EffController
 
             $category->name = $category_form->name;
             $category->description = $category_form->description;
-            $category->parent_id = $category_form->parent_id;
+            $category->parent_id = Ids::decodeId($category_form->parent_id);
 
             if (!$category->save()) {
 

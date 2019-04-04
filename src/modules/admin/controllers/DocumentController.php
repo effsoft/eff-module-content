@@ -4,6 +4,7 @@ namespace effsoft\eff\module\content\modules\admin\controllers;
 
 use Couchbase\Document;
 use effsoft\eff\EffController;
+use effsoft\eff\helpers\Ids;
 use effsoft\eff\module\content\models\CategoryModel;
 use effsoft\eff\module\content\models\DocumentForm;
 use effsoft\eff\module\content\models\DocumentModel;
@@ -15,6 +16,15 @@ use yii\web\Response;
 use yii\widgets\ActiveForm;
 
 class DocumentController extends EffController{
+
+    public function init(){
+        parent::init();
+        $this->pushBreadcrumbLink([
+            'label' => \Yii::t('content/app', 'Document'),
+            'url' => ['/content/admin/document/manage'],
+        ]);
+
+    }
 
     public function behaviors()
     {
@@ -33,6 +43,10 @@ class DocumentController extends EffController{
     }
 
     function actionManage(){
+        $this->pushBreadcrumbLink([
+            'label' => \Yii::t('content/app', 'Manage'),
+        ]);
+
         return $this->render('//content/admin/document/manage',[]);
     }
 
@@ -74,6 +88,11 @@ class DocumentController extends EffController{
     }
 
     function actionCreate(){
+
+        $this->pushBreadcrumbLink([
+            'label' => \Yii::t('content/app', 'Create'),
+        ]);
+
         $document_form = new DocumentForm();
 
         if(\Yii::$app->request->isAjax){
@@ -96,14 +115,19 @@ class DocumentController extends EffController{
                 $document_model = new DocumentModel();
                 $document_model->uid = strval(\Yii::$app->user->identity->getId());
                 $document_model->subject = $document_form->subject;
-                $document_model->category = $document_form->category;
+                $document_model->category = Ids::decodeId($document_form->category);
                 $document_model->author = $document_form->author;
                 if (!empty($document_form->cover)) {
-                    $document_model->cover = MediaModel::findOne(['_id' => $document_form->cover])->toArray();
+                    $document_model->cover = ArrayHelper::toArray(MediaModel::findOne(['_id' => Ids::decodeId($document_form->cover)]));
                 }
                 if (!empty($document_form->carousel)){
-                    $document_model->carousel = ArrayHelper::toArray(MediaModel::findAll(['_id' =>  $document_form->carousel]));
+                    $document_model->carousel = ArrayHelper::toArray(MediaModel::findAll([
+                        '_id' =>  array_map(function($id){
+                            return Ids::decodeId($id);
+                        },$document_form->carousel)
+                    ]));
                 }
+
                 $document_model->introduction = $document_form->introduction;
                 $document_model->content = $document_form->content;
 
@@ -119,4 +143,5 @@ class DocumentController extends EffController{
             'document_form' => $document_form,
         ]);
     }
+
 }
