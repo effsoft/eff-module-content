@@ -7,13 +7,19 @@ class DocumentForm extends EffModel{
 
     public $subject;
     public $category;
+    public $author;
+    public $cover;
+    public $carousel;
     public $introduction;
     public $content;
 
     public function rules(){
         return [
-            ['subject','required','message' => '请填写文章标题！'],
-            ['category','string'],
+            ['subject', 'required','message' => '请填写文章标题！'],
+            ['category', 'string'],
+            ['author', 'safe'],
+            ['cover', 'safe'],
+            ['carousel', 'safe'],
             ['introduction', 'string'],
             ['content', 'string'],
         ];

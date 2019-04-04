@@ -105,20 +105,20 @@ class CategoryController extends EffController
         if (!\Yii::$app->request->isAjax) {
             return JsonResult::getNewInstance()->setStatus(101)
                 ->setMessage('Bad request!')
-                ->getResult();
+                ->getResponse();
         }
 
         if (!\Yii::$app->request->validateCsrfToken()) {
             return JsonResult::getNewInstance()->setStatus(102)
                 ->setMessage('Bad csrf token!')
-                ->getResult();
+                ->getResponse();
         }
 
         $category_id = Ids::decodeId(\Yii::$app->request->post('category_id'));
         if (empty($category_id)) {
             return JsonResult::getNewInstance()->setStatus(103)
                 ->setMessage('Bad parameters!')
-                ->getResult();
+                ->getResponse();
         }
 
         //check child cateogry
@@ -126,19 +126,19 @@ class CategoryController extends EffController
         if (!empty($sub_cates)) {
             return JsonResult::getNewInstance()->setStatus(104)
                 ->setMessage('Has sub categories!')
-                ->getResult();
+                ->getResponse();
         }
 
         if (!CategoryModel::deleteAll(['_id' => $category_id])) {
             return JsonResult::getNewInstance()->setStatus(105)
                 ->setMessage('DB error!')
-                ->getResult();
+                ->getResponse();
         }
 
         //success
         return JsonResult::getNewInstance()->setStatus(0)
             ->setMessage('')
-            ->getResult();
+            ->getResponse();
     }
 
     public function actionEdit()
