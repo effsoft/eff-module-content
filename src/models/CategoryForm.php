@@ -4,15 +4,20 @@ namespace effsoft\eff\module\content\models;
 
 use effsoft\eff\EffModel;
 
-class CategoryForm extends EffModel{
+class CategoryForm extends EffModel
+{
     public $name;
+    public $type;
     public $parent_id;
     public $description;
 
-    public function rules(){
+    public function rules()
+    {
         return [
-            ['name','required','message' => '请填写分类名称！'],
-            ['parent_id','string'],
+            ['name', 'required'],
+            [['name','description','type','parent_id'], 'trim'],
+            ['type', 'required'],
+            ['parent_id', 'string'],
             ['description', 'string'],
         ];
     }
