@@ -34,6 +34,7 @@ class CategoryModel extends EffMysqlActiveRecord
         return [
             'id',
             'uid',
+            'target_id',
             'name',
             'type',
             'description',
